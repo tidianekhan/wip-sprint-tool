@@ -1,22 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WIP Sprint Intelligence</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-    <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #0D0D0D; }
-      @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-      @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-      ::-webkit-scrollbar { width: 3px; }
-      ::-webkit-scrollbar-thumb { background: #E8192C; }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WIP Sprint Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0D0D0D; color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .fade { animation: fadeIn 0.35s ease forwards; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: #E8192C; }
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.35s ease; }
+    button { font-family: 'DM Sans', sans-serif; }
+  </style>
+</head>
+<body>
+
+<div style="max-width:720px;margin:0 auto;padding:0 0 48px">
+
+  <!-- HEADER -->
+  <div id="header" style="border-bottom:1px solid #2A2A2A;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:52px;background:#0D0D0D;position:sticky;top:0;z-index:10">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="background:#E8192C;color:#fff;font-family:'Space Mono',monospace;font-weight:700;font-size:12px;padding:4px 10px">*WIP</div>
+      <div style="font-size:11px;color:#888;font-family:'Space Mono',monospace;letter-spacing:0.1em">SPRINT INTELLIGENCE</div>
+    </div>
+    <button id="newSprintBtn" onclick="reset()" style="display:none;background:none;border:1px solid #3A3A3A;color:#888;font-size:10px;padding:6px 14px;cursor:pointer;font-family:'Space Mono',monospace;border-radius:2px">NEW SPRINT</button>
+  </div>
+
+  <div style="max-width:680px;margin:0 auto;padding:40px 32px">
+
+    <!-- UPLOAD SCREEN -->
+    <div id="uploadScreen" class="screen active">
+      <div style="font-size:10px;font-family:'Space Mono',monospace;color:#E8192C;letter-spacing:0.15em;margin-bottom:10px">/ SPRINT ANALYSIS</div>
+      <h1 style="font-size:30px;font-weight:700;line-height:1.15;letter-spacing:-0.02em;margin-bottom:14px">
+        Upload sprint materials.<br>
+        <span style="color:#E8192C">Get shared truth.</span>
+      </h1>
+      <p style="font-size:13px;color:#888;line-height:1.75;max-width:440px;margin-bottom:36px">
+        Drop the founder meeting transcript, then the startup documents. Three AI stages run in sequence and synthesise both into a single shared truth document.
+      </p>
+
+      <div style="font-size:10px;font-family:'Space Mono',monospace;color:#888;letter-spacing:0.12em;margin-bottom:8px">STEP 1 — MEETING TRANSCRIPT</div>
+      <div id="zone1" class="dropzone" onclick="triggerFile('file1')" ondragover="dragOver(event,this)" ondragleave="dragLeave(event,this)" ondrop="dropFile(event,'file1',this)"
+        style="border:2px dashed #3A3A3A;border-radius:3px;padding:36px 24px;text-align:center;cursor:pointer;background:#1A1A1A;transition:all 0.2s">
+        <div style="font-size:28px;margin-bottom:10px;color:#3A3A3A">↓</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;font-family:'Space Mono',monospace;margin-bottom:5px">Drop meeting transcript here</div>
+        <div style="font-size:11px;color:#888">PDF — founder call, sprint debrief, or partner conversation</div>
+        <input id="file1" type="file" accept=".pdf" style="display:none" onchange="fileSelected('file1','zone1','label1')">
+      </div>
+      <div id="label1" style="display:none;margin-top:6px;font-size:11px;color:#888;font-family:'Space Mono',monospace"></div>
+
+      <div style="height:14px"></div>
+
+      <div id="step2label" style="font-size:10px;font-family:'Space Mono',monospace;color:#3A3A3A;letter-spacing:0.12em;margin-bottom:8px">STEP 2 — STARTUP DOCUMENTS</div>
+      <div id="zone2" class="dropzone"
+        style="border:2px dashed #2A2A2A;border-radius:3px;padding:36px 24px;text-align:center;cursor:default;background:#1A1A1A;transition:all 0.2s;opacity:0.4">
+        <div style="font-size:28px;margin-bottom:10px;color:#3A3A3A">○</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;font-family:'Space Mono',monospace;margin-bottom:5px">Drop startup submission here</div>
+        <div style="font-size:11px;color:#888">Complete step 1 first</div>
+        <input id="file2" type="file" accept=".pdf" style="display:none" onchange="fileSelected('file2','zone2','label2')">
+      </div>
+      <div id="label2" style="display:none;margin-top:6px;font-size:11px;color:#888;font-family:'Space Mono',monospace"></div>
+
+      <button id="runBtn" onclick="runPipeline()" disabled
+        style="width:100%;padding:16px;background:#2A2A2A;border:none;color:#fff;font-size:12px;font-weight:700;font-family:'Space Mono',monospace;letter-spacing:0.1em;cursor:not-allowed;border-radius:2px;margin-top:20px">
+        UPLOAD BOTH FILES TO CONTINUE
+      </button>
+
+      <div style="margin-top:14px;padding:10px 14px;border:1px solid #3A3A3A;border-radius:3px;font-size:10px;color:#888;font-family:'Space Mono',monospace;line-height:1.7">
+        PROTOTYPE NOTE: This demo uses pre-generated outputs from a real Dungse Labs sprint session. Live AI synthesis connects via Vercel serverless proxy in the production version.
+      </div>
+    </div>
+
+    <!-- PROCESSING SCREEN -->
+    <div id="processingScreen" class="screen">
+      <div style="font-size:10px;font-family:'Space Mono',monospace;color:#E8192C;letter-spacing:0.15em;margin-bottom:10px">/ RUNNING ANALYSIS</div>
+      <h1 style="font-size:28px;font-weight:700;letter-spacing:-0.02em;margin-bottom:32px">Processing sprint materials</h1>
+      <div style="background:#1A1A1A;border-radius:3px;padding:8px 24px;margin-bottom:28px">
+        <div class="step-row" id="step-meeting">
+          <div class="step-dot" id="dot-meeting">○</div>
+          <div><div class="step-label" id="lbl-meeting" style="color:#3A3A3A">Extracting meeting insights</div></div>
+        </div>
+        <div class="step-row" id="step-diagnosis">
+          <div class="step-dot" id="dot-diagnosis">○</div>
+          <div><div class="step-label" id="lbl-diagnosis" style="color:#3A3A3A">Diagnosing startup venture</div></div>
+        </div>
+        <div class="step-row" id="step-truth">
+          <div class="step-dot" id="dot-truth">○</div>
+          <div><div class="step-label" id="lbl-truth" style="color:#3A3A3A">Generating shared truth</div></div>
+        </div>
+      </div>
+      <div style="background:#1A1A1A;border-radius:3px;padding:14px 18px;font-size:11px;color:#888;line-height:1.75;font-family:'Space Mono',monospace">
+        Each stage feeds the next. Meeting extract and venture diagnosis are synthesised into the shared truth document. Human review required before external sharing.
+      </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="resultsScreen" class="screen">
+      <div style="font-size:10px;font-family:'Space Mono',monospace;color:#E8192C;letter-spacing:0.15em;margin-bottom:10px">/ ANALYSIS COMPLETE</div>
+      <h1 style="font-size:28px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px">Sprint intelligence ready</h1>
+      <p style="font-size:13px;color:#888;margin-bottom:28px">Shared Truth is the primary output. Intermediate stages are available for audit and human review.</p>
+
+      <div style="background:#1A1A1A;border-radius:3px;padding:20px 24px">
+        <div style="display:flex;border-bottom:1px solid #2A2A2A;margin-bottom:20px">
+          <button onclick="setTab('truth')" id="tab-truth" style="background:none;border:none;cursor:pointer;padding:10px 20px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;font-family:'Space Mono',monospace;color:#fff;border-bottom:2px solid #E8192C;margin-bottom:-1px">Shared Truth</button>
+          <button onclick="setTab('diagnosis')" id="tab-diagnosis" style="background:none;border:none;cursor:pointer;padding:10px 20px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;font-family:'Space Mono',monospace;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px">Venture Diagnosis</button>
+          <button onclick="setTab('meeting')" id="tab-meeting" style="background:none;border:none;cursor:pointer;padding:10px 20px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;font-family:'Space Mono',monospace;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px">Meeting Extract</button>
+        </div>
+        <div id="tabContent" style="min-height:320px;max-height:520px;overflow-y:auto;padding-right:8px"></div>
+      </div>
+
+      <div style="margin-top:12px;padding:12px 16px;border:1px solid #3A3A3A;border-radius:3px;font-size:11px;color:#888;font-family:'Space Mono',monospace">
+        ! Human review required before sharing Shared Truth externally with founders or investors.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.step-row { display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid #2A2A2A; }
+.step-dot { width:28px;height:28px;border-radius:50%;border:2px solid #3A3A3A;display:flex;align-items:center;justify-content:center;font-size:12px;color:#3A3A3A;flex-shrink:0; }
+.step-label { font-size:12px;font-weight:700;font-family:'Space Mono',monospace; }
+.step-running .step-dot { border-color:#fff;color:#fff;animation:pulse 1.4s infinite; }
+.step-running .step-label { color:#fff; }
+.step-done .step-dot { border-color:#E8192C;color:#E8192C; }
+.step-done .step-label { color:#E8192C; }
+</style>
+
+<script>
+const RED='#E8192C';
+let file1Ready=false, file2Ready=false, activeTab='truth';
+
+const MOCK = {
+meeting: `## OUTCOME SNAPSHOT
+— Calvin reframed the studio role: the intervention must change Baloon's communication structure, not just deliver outputs to startups
+— Decision made to approach Mango collaboratively (build the solution with her, not present it to her) to avoid triggering defensive review
+— Hobbes acknowledged he had been framing the problem from the wrong layer — positioning for startups rather than restructuring Baloon's incentive architecture
+— Agreement that the next email to startups is on the studio, not Baloon — this is the first real leverage point
+— The pipeline being dry was named openly as the real urgency driver behind wanting this sprint to work
+
+## THIS WEEK'S GOAL
+Design the mandatory/optional incentive framework and secure a working session with Mango before she leaves again.
+
+## TOP PRIORITIES
+1. Redesign Baloon's startup communication structure (mandatory vs optional framing with accountability)
+2. Schedule working session with Mango — collaborative build, not a pitch
+3. Draft the studio's first direct email to startups
+4. Analyse the existing startup profiles Hobbes has already scanned
+5. Define what the studio will be held accountable for delivering in this sprint
+
+## NEXT 7 DAYS - ACTIONS
+ACTION #1 | Owner: Hobbes | Deliverable: One-page framework separating mandatory deliverables from optional value-add | Done-when: Calvin has reviewed it
+ACTION #2 | Owner: Hobbes | Deliverable: Calendar invite sent to Mango for in-person working session | Done-when: Mango has confirmed attendance
+ACTION #3 | Owner: Hobbes | Deliverable: Draft of studio's first email to startups | Done-when: Calvin has approved the draft
+ACTION #4 | Owner: Hobbes | Deliverable: Structured summary of startup profiles shared with Calvin | Done-when: Calvin has received and read it
+ACTION #5 | Owner: Both | Deliverable: Agreed list of what the studio will and will not be accountable for | Done-when: Both parties have signed off verbally
+
+## DECISION GATES
+GATE #1: Does the studio contact startups this week or wait for Mango? | Owner: Calvin | Decide-by: Tomorrow
+GATE #2: Which location for the Mango working session? | Owner: Hobbes | Decide-by: Today
+
+## RISK REGISTER
+RISK #1: Baloon reverts to existing communication patterns after the working session | Cause: Momentum — institutional habit stronger than a single intervention
+RISK #2: Mango receives the framework as a critique rather than co-creation | Cause: Framing failure — presenting instead of building together
+RISK #3: Studio gets held accountable for startup outcomes it cannot control | Cause: Constraint — studio was not part of the selection process
+
+## UNKNOWNS
+UNKNOWN #1: Whether the final startup slot will be filled with a weak candidate | Type: Open dependency on Baloon's selection process
+UNKNOWN #2: What Bee has already communicated to startups on the studio's behalf | Type: Missing evidence
+
+## METHODS
+METHOD: Never present a solution to a stakeholder who hasn't co-built it — they will wear the critical eye, not the ownership hat
+METHOD: Separate mandatory deliverables (with accountability) from optional value-add (with visible pricing)
+METHOD: Setting the stage correctly is a precondition for impact, not a soft concern
+
+Bottleneck this week: Securing the Mango working session before she travels again`,
+
+diagnosis: `## MECHANISM 1 - CONTEXT-FIRST DIAGNOSIS
+
+Why Now
+What is visible: EU Single-Use Plastics Directive active, Dutch dairy surplus regulations tightening, ESG pressure on buyers increasing. Five years of R&D completed.
+What it suggests: The regulatory window is real and creates genuine buyer openness that did not exist three years ago.
+What is missing: No evidence that target buyers are actively searching for alternatives right now vs. being theoretically open.
+Confidence: medium
+
+Founder
+What is visible: Engineer and designer background, 5 years building across two countries, personal lived connection to the problem, solo active founder.
+What it suggests: Deep material knowledge and genuine conviction. The origin story is credible and differentiating.
+What is missing: Commercial track record. The founder has not yet closed a repeating revenue relationship.
+Confidence: medium
+
+Validation and Evidence
+What is visible: Lab data on Dungwood (30MPa flexural strength). Biodegradation tested. 135K EUR in grants. Four pilot engagements across wildlife, municipality, architecture, automotive.
+What it suggests: Technical feasibility is established. Institutional credibility from grant bodies is real.
+What is missing: Every pilot ended without repeat purchase or scaling commitment. The pattern of interest-without-conversion is the most important signal in the material.
+Confidence: low on commercial readiness
+
+## MECHANISM 2 - CLAIM INTEGRITY
+
+Claim: Dungwood flexural strength is at par with pinewood
+Type: Bounded
+Supported: Lab data exists (30MPa vs 40MPa pinewood)
+Depends on: Lab conditions translating to real manufacturing environments
+Cannot yet support: Buyer specification approval or structural certification
+
+Claim: The regulatory environment creates urgency for bio-based alternatives
+Type: Directional
+Supported: EU directives named and active
+Depends on: Buyers actually being procurement-ready, not just policy-aware
+Cannot yet support: Any specific buyer's decision to switch materials this year
+
+Claim: Mercedes, BMW, Jaguar Land Rover represent commercial traction
+Type: Aspirational — these were exploratory CMF conversations without KPIs
+Supported: Meetings occurred
+Cannot yet support: Pipeline valuation or investor traction claims
+
+## MECHANISM 3 - PRACTICAL ADDRESSABILITY
+
+Is the user group real in practical form?
+Theoretically broad (packaging, furniture, construction, automotive). In practice each sector requires different certifications, different sample formats, different procurement cycles. The usable segment right now is likely one sector, one geography, one buyer profile.
+
+Is the buyer reachable?
+Past pilots show buyers are reachable for conversations. The gap is converting conversations to commitments. The pattern has repeated four times.
+
+What is narrower in practice?
+The 17-country OHADA claim is structurally correct but practically irrelevant at this stage. The real addressable market is 2-3 industries in 1-2 geographies where the founder has warm relationships and the certification pathway is shortest.
+
+## MECHANISM 4 - STAGE-APPROPRIATE JUDGMENT
+
+Must be known now: Which one industry and one buyer profile is the sprint targeting? Without this the 25K EUR budget will be spread too thin.
+
+Important soon but not blocking: Certification pathway and timeline for the chosen industry.
+
+Where material sounds more mature than it proves: The automotive leads listed alongside paying clients. These were exploratory conversations without KPIs.
+
+Where it is early but coherent: The decision to defer certification until product-market fit is identified is correct. The sprint goal of one LOI or pilot commitment is the right unit of validation.
+
+## SYNTHESIS
+
+Strongest areas: Technical foundation is real. Founder conviction and origin story are credible. Regulatory timing is genuinely favourable. Sprint goal is correctly defined.
+
+Biggest risks: The pattern of interest-without-conversion has repeated four times across four different industries. This is the central unresolved question.
+
+Communication vs structural: Automotive leads presented at same weight as paying clients is a communication issue. The interest-without-conversion pattern is potentially structural.
+
+What most affects readiness: Whether the studio can help the founder commit to one specific buyer profile before the sprint begins.`,
+
+truth: `## VENTURE REALITY
+Dungse Labs is a technically validated but commercially unproven biomaterials venture that has demonstrated the ability to generate interest across multiple industries without yet converting that interest into a repeating commercial relationship.
+
+## WHAT IS GENUINELY STRONG
+— Five years of R&D with lab-verified material performance (Dungwood at 30MPa, biodegradation confirmed) — this is not hypothetical
+— 135K EUR in competitive grants from credible institutions including Wageningen University and Province of Zuid-Holland
+— Founder's dual-context origin story (Indian indigenous knowledge and Dutch dairy waste problem) is rare, credible, and directly relevant — not a constructed narrative
+— Regulatory timing is genuinely favourable — EU Single-Use Plastics Directive and Dutch dairy emissions regulations create real buyer openness that did not exist three years ago
+
+## MAIN BREAKPOINTS
+— Four pilot engagements across four industries, zero repeat purchases or scaling commitments — this pattern is the most important unresolved signal and the sprint must explain it, not move past it
+— No dedicated commercial co-founder — the founder is an engineer running sales, go-to-market, and technical development simultaneously
+— The certification gap is not a later-stage concern — without at least one industry-specific certification pathway underway, buyers who reach procurement cannot proceed
+— The sprint budget of 25K EUR is insufficient if split across 2-3 industries — it is sufficient if concentrated on one
+
+## CLAIMS NOT YET STRONG ENOUGH
+— Mercedes, BMW, Jaguar Land Rover listed as traction — these were exploratory CMF conversations without KPIs, not commercial leads
+— The 17-country OHADA market claim is structurally correct but practically irrelevant at this stage
+— The regulatory environment creates urgency — openness is not urgency; no evidence any specific buyer has a procurement decision gated on bio-based materials this year
+
+## COMMUNICATION VS STRUCTURAL
+Communication issues: Automotive conversations presented at same weight as paying clients. Market size framed as 17 countries when the real addressable segment is much narrower.
+Structural issues: Interest-without-conversion pattern across four engagements — root cause not yet identified. Absence of commercial co-founder. No certification pathway initiated for any priority industry.
+
+## WHAT MUST BE ANSWERED NOW
+1. What is the specific buyer profile, industry, and geography the sprint will target — not a list of options, a single committed choice?
+2. Why have four previous pilot engagements not converted — is that a messaging, pricing, certification, or product-market fit problem?
+3. Who is the commercial counterpart to the founder, and is there a co-founder or BD hire plan before the next funding round?
+
+## MOST APPROPRIATE NEXT MOVE
+Commit to one industry and one buyer profile before the sprint begins, use the 25K EUR to put real material samples in front of 8-10 serious buyers in that segment, and treat securing one LOI or pilot agreement as the binary success condition.`
+};
+
+function triggerFile(id) { document.getElementById(id).click(); }
+
+function dragOver(e, zone) { e.preventDefault(); zone.style.borderColor=RED; zone.style.background=RED+'10'; }
+function dragLeave(e, zone) { zone.style.borderColor='#3A3A3A'; zone.style.background='#1A1A1A'; }
+
+function dropFile(e, fileId, zone) {
+  e.preventDefault();
+  zone.style.borderColor='#3A3A3A'; zone.style.background='#1A1A1A';
+  const f = e.dataTransfer.files[0];
+  if (f && f.type==='application/pdf') setFile(fileId, f, zone.id, fileId==='file1'?'label1':'label2');
+}
+
+function fileSelected(fileId, zoneId, labelId) {
+  const f = document.getElementById(fileId).files[0];
+  if (f) setFile(fileId, f, zoneId, labelId);
+}
+
+function setFile(fileId, f, zoneId, labelId) {
+  const zone = document.getElementById(zoneId);
+  zone.style.borderColor = RED;
+  zone.style.background = RED+'18';
+  zone.style.opacity = '1';
+  zone.innerHTML = `<div style="font-size:22px;margin-bottom:6px;color:${RED}">✓</div><div style="font-size:12px;font-weight:700;color:#fff;font-family:'Space Mono',monospace">${f.name}</div><div style="font-size:11px;color:#888;margin-top:4px">${(f.size/1024).toFixed(0)} KB</div><input id="${fileId}" type="file" accept=".pdf" style="display:none" onchange="fileSelected('${fileId}','${zoneId}','${labelId}')">`;
+
+  if (fileId==='file1') {
+    file1Ready = true;
+    // Activate zone 2
+    const z2 = document.getElementById('zone2');
+    z2.style.opacity = '1';
+    z2.style.cursor = 'pointer';
+    z2.style.borderColor = '#3A3A3A';
+    z2.onclick = () => document.getElementById('file2').click();
+    z2.ondragover = (e) => dragOver(e, z2);
+    z2.ondragleave = (e) => dragLeave(e, z2);
+    z2.ondrop = (e) => dropFile(e, 'file2', z2);
+    z2.innerHTML = `<div style="font-size:28px;margin-bottom:10px;color:#3A3A3A">↓</div><div style="font-size:13px;font-weight:700;color:#fff;font-family:'Space Mono',monospace;margin-bottom:5px">Drop startup submission here</div><div style="font-size:11px;color:#888">PDF — sprint document, pitch deck, or founder brief</div><input id="file2" type="file" accept=".pdf" style="display:none" onchange="fileSelected('file2','zone2','label2')">`;
+    document.getElementById('step2label').style.color = '#888';
+  }
+
+  if (fileId==='file2') { file2Ready = true; }
+
+  if (file1Ready && file2Ready) {
+    const btn = document.getElementById('runBtn');
+    btn.style.background = RED;
+    btn.style.cursor = 'pointer';
+    btn.disabled = false;
+    btn.textContent = 'RUN SPRINT ANALYSIS →';
+  }
+}
+
+async function runPipeline() {
+  showScreen('processingScreen');
+  document.getElementById('newSprintBtn').style.display = 'block';
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+
+  setStep('meeting','active');
+  await delay(2200);
+  setStep('meeting','done');
+  setStep('diagnosis','active');
+  await delay(2800);
+  setStep('diagnosis','done');
+  setStep('truth','active');
+  await delay(2000);
+  setStep('truth','done');
+
+  await delay(400);
+  showScreen('resultsScreen');
+  setTab('truth');
+}
+
+function setStep(key, status) {
+  const row = document.getElementById('step-'+key);
+  const dot = document.getElementById('dot-'+key);
+  const lbl = document.getElementById('lbl-'+key);
+  row.className = 'step-row ' + (status==='active'?'step-running':status==='done'?'step-done':'');
+  dot.textContent = status==='done'?'✓':status==='active'?'◉':'○';
+}
+
+function setTab(key) {
+  activeTab = key;
+  ['truth','diagnosis','meeting'].forEach(k => {
+    const btn = document.getElementById('tab-'+k);
+    btn.style.color = k===key ? '#fff' : '#888';
+    btn.style.borderBottom = k===key ? '2px solid #E8192C' : '2px solid transparent';
+  });
+  document.getElementById('tabContent').innerHTML = parseMarkdown(MOCK[key]);
+}
+
+function parseMarkdown(text) {
+  return text.split('\n').map(line => {
+    if (line.startsWith('## ')) return `<div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#E8192C;text-transform:uppercase;margin-top:22px;margin-bottom:7px;font-family:'Space Mono',monospace;border-bottom:1px solid #E8192C44;padding-bottom:3px">${line.replace('## ','')}</div>`;
+    if (line.match(/^(ACTION|GATE|RISK|UNKNOWN|METHOD|Bottleneck)/)) return `<div style="background:#2A2A2A;border-left:3px solid #E8192C;padding:8px 12px;margin-bottom:6px;border-radius:0 3px 3px 0;font-size:11px;color:#BBBBBB;font-family:'Space Mono',monospace;line-height:1.7">${line}</div>`;
+    if (line.startsWith('— ')||line.startsWith('- ')||line.startsWith('• ')) return `<div style="display:flex;gap:8px;margin-bottom:5px;font-size:13px;color:#BBBBBB;line-height:1.65"><span style="color:#E8192C;flex-shrink:0">—</span><span>${line.replace(/^[—\-•]\s/,'')}</span></div>`;
+    if (line.trim()) return `<p style="font-size:13px;color:#BBBBBB;line-height:1.7;margin-bottom:5px">${line}</p>`;
+    return '';
+  }).join('');
+}
+
+function showScreen(id) {
+  ['uploadScreen','processingScreen','resultsScreen'].forEach(s => {
+    document.getElementById(s).className = 'screen' + (s===id?' active':'');
+  });
+}
+
+function reset() {
+  file1Ready=false; file2Ready=false;
+  showScreen('uploadScreen');
+  document.getElementById('newSprintBtn').style.display='none';
+  location.reload();
+}
+</script>
+</body>
 </html>
